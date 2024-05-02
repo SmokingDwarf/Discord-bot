@@ -1,10 +1,7 @@
-print("Test")
 import discord
 import os
 import discord_user
 from random import randint, choice
-
-######################################################################
 
 def reply_to_self(client, user):
 	id = user
@@ -43,16 +40,10 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 
-######################################################################
-
-
-
-
 @reply_to_all(client) # eerste stukje code
 def send_message(message):
   if message.content:
     return message.content
-	#print(message.content)
   else:
     return "Er gaat iets fout!"
 
@@ -79,27 +70,6 @@ except Exception as e:
   print(e)
   os.system("kill 1")
 
-#################################################
-# HEY MICH! Bij deze.. COMMENTS!
-#
-# Ik hoor je vast vragen "ja maar hoe doen?"
-# Nou, heel simpel. De regel moet beginnen met een '#'
-# Dan negeert het programma het VOLLEDIG! :)
-#
-# Hoe zorg je dat je ineens heel veel regels er uit-'comment'?
-# Heel simpel. Selecteer ze allemaal en druk op 'ctrl + /'
-# Zelfde om ze ook weer te in-'comment'-en.
-#
-##################################################
-# OM DE CODE UIT TE VOEREN OP EEN COOLE MANIER:
-# 
-# STAP 1: Open de powershell
-# STAP 2: Gebruik het volgende commando: & "C:\Users\Michael Vlaar\AppData\Local\Programs\Python\Python312\python" "D:\Programmeren\Discord-bot\main.py"
-#
-# Je zit nu in de python omgeving!
-
-
-######################################################################
 
 # downtime_activities_list = ["Work"]
 
