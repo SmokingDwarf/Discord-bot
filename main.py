@@ -1,4 +1,4 @@
-import discord
+import discord # type: ignore
 import os
 import json
 import discord_user
@@ -43,13 +43,15 @@ client = discord.Client(intents=intents)
 
 @reply_to_all(client)
 def send_message(message):
+	username = str(message.author)
 	if message.content:
-		with open ("discord_bot_users.json", "r") as file:
-			data = json.load(file)
-		for key, value in data.items():
-			return (f"{key}: {value}")
+		with open ("discord_bot_users.json", "ra") as file:
+			users = json.load(file)
+		for key, value in users.items():
+			if key == username:
+				return (value)
+				
 
-#return message.content
 
 
 
@@ -70,7 +72,7 @@ def send_message(message):
 
 
 try:
-  print("Lets go")
+  print("De bot is online.")
   client.run(TOKEN)
 except Exception as e:
   print(e)
