@@ -45,12 +45,14 @@ client = discord.Client(intents=intents)
 def send_message(message):
 	username = str(message.author)
 	if message.content:
-		with open ("discord_bot_users.json", "ra") as file:
+		with open ("discord_bot_users.json", "r") as file:
 			users = json.load(file)
 		for key, value in users.items():
 			if key == username:
-				return (value)
-				
+				return f"Hallo {users[key]["naam"]}!"
+			else:
+				return f"Hallo {username}, wat is de naam van je karakter?"
+
 
 
 
