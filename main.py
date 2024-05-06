@@ -1,5 +1,6 @@
 import discord
 import os
+import json
 import discord_user
 from random import randint, choice
 
@@ -40,12 +41,17 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 
-@reply_to_all(client) # eerste stukje code
+@reply_to_all(client)
 def send_message(message):
-  if message.content:
-    return message.content
-  else:
-    return "Er gaat iets fout!"
+	if message.content:
+		with open ("discord_bot_users.json", "r") as file:
+			data = json.load(file)
+		for key, value in data.items():
+			return (f"{key}: {value}")
+
+#return message.content
+
+
 
 # @reply_to_all(client) #tweede stukje code
 # def check_wages(message):
