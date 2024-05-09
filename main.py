@@ -45,11 +45,12 @@ client = discord.Client(intents=intents)
 def send_message(message):
 	username = str(message.author)
 	if message.content:
-		with open ("discord_bot_users.json", "ra") as file:
+		with open ("discord_bot_users.json", "r") as file:
 			users = json.load(file)
+		
 		for key, value in users.items():
 			if key == username:
-				return (value)
+				return (users[key]["naam"])
 				
 
 
