@@ -1,6 +1,10 @@
 {
-    "mich5613" : [
-        {"naam" : "Heracles"}, 
-        {"class" : "Champion"}
-    ] 
+    "mich5613" : {
+        "naam" : "Heracles", 
+        "class" : "Champion"
+    },
+    "mandraki15_35711" : {
+        "naam" : "Ush'ga",
+        "class" : "Mystic"
+    } 
 }
