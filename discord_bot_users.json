@@ -1,10 +1,14 @@
 {
     "mich5613" : {
-        "naam" : "Heracles", 
-        "class" : "Champion"
+        "name" : "Heracles", 
+        "class" : "Champion",
+        "ability scores" : {
+            "dexterity" : 15,
+            "wisdom" : 10
+        }
     },
     "mandraki15_35711" : {
-        "naam" : "Ush'ga",
+        "name" : "Ush'ga",
         "class" : "Mystic"
     } 
 }

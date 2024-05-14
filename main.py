@@ -38,20 +38,62 @@ USERNAME = discord_user.USERNAME
 
 intents = discord.Intents.default()
 intents.message_content = True
-
 client = discord.Client(intents=intents)
+
+#States
+initialize_state = True
+activity_asking_state = False
+new_user_state = False
+skill_asking_state = False
+
+#Lists & dicts
+activity_list = ["work"]
+skill_dict = {"acrobatics": "dexterity", "animal handling": "wisdom"}
 
 @reply_to_all(client)
 def send_message(message):
+	global initialize_state
+	global activity_asking_state
+	global new_user_state
+	global skill_asking_state
+	global activity_list
+	global skill_dict
 	username = str(message.author)
-	if message.content:
+	
+	if message.content and message.channel.name == 'michs-bot':
 		with open ("discord_bot_users.json", "r") as file:
 			users = json.load(file)
 		
-		for key, value in users.items():
-			if key == username:
-				return (users[key]["naam"])
-				
+		if initialize_state == True:
+			initialize_state = False
+			for key, value in users.items():
+				if key == username:
+					activity_asking_state = True
+					return f"Hello {(users[key]["name"])}! Select a downtime activity from: work, ..."
+				elif key is not username:
+					new_user_state == True
+					return f"Welcome, new adventurer! What is your name?"
+		
+		elif activity_asking_state == True:
+			if "work" in message.content.lower():
+				activity_asking_state = False
+				skill_asking_state = True
+				return f"Great. Select a skill from {skill_dict.keys}."
+			else:
+				return f"Please select from: work, ..."
+		
+		elif skill_asking_state == True:
+			if message.content.lower() in skill_dict:
+				skill_asking_state = False
+				chosen_skill = message.content.lower()
+				for key, value in skill_dict.items():
+					if key == chosen_skill:
+						associated_ability = value
+						print(f"associated_ability_score = {associated_ability}")
+				for value in users[username]["ability scores"]:
+						associated_ability_score = value
+						return f"your {associated_ability} score is {associated_ability_score}."
+
 
 
 
