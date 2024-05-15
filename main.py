@@ -45,10 +45,45 @@ initialize_state = True
 activity_asking_state = False
 new_user_state = False
 skill_asking_state = False
+proceed_state = False
 
 #Lists & dicts
 activity_list = ["work"]
 skill_dict = {"acrobatics": "dexterity", "animal handling": "wisdom"}
+
+def get_ability_modifier(ability_score):	
+	if ability_score == 1:
+		ability_modifier = -5
+	elif ability_score == 2 or ability_score == 3:
+		ability_modifier = -4
+	elif ability_score == 4 or ability_score == 5:
+		ability_modifier = -3
+	elif ability_score == 6 or ability_score == 7:
+		ability_modifier = -2
+	elif ability_score == 8 or ability_score == 9:
+		ability_modifier = -1
+	elif ability_score == 10 or ability_score == 11:
+		ability_modifier = 0
+	elif ability_score == 12 or ability_score == 13:
+		ability_modifier = 1
+	elif ability_score == 14 or ability_score == 15:
+		ability_modifier = 2
+	elif ability_score == 16 or ability_score == 17:
+		ability_modifier = 3
+	elif ability_score == 18 or ability_score == 19:
+		ability_modifier = 4
+	elif ability_score == 20 or ability_score == 21:
+		ability_modifier = 5
+	elif ability_score == 22 or ability_score == 23:
+		ability_modifier = 6
+	elif ability_score == 24 or ability_score == 25:
+		ability_modifier = 7
+	elif ability_score == 26 or ability_score == 27:
+		ability_modifier = 8
+	elif ability_score == 28 or ability_score == 29:
+		ability_modifier = 9
+	elif ability_score == 30:
+		ability_modifier = 10
 
 @reply_to_all(client)
 def send_message(message):
@@ -58,6 +93,7 @@ def send_message(message):
 	global skill_asking_state
 	global activity_list
 	global skill_dict
+	global proceed_state
 	username = str(message.author)
 	
 	if message.content and message.channel.name == 'michs-bot':
@@ -67,33 +103,58 @@ def send_message(message):
 		if initialize_state == True:
 			initialize_state = False
 			for key, value in users.items():
+				
 				if key == username:
 					activity_asking_state = True
-					return f"Hello {(users[key]["name"])}! Select a downtime activity from: work, ..."
+					return f"Hello {(users[key]["name"])}! Select a downtime activity from: {', '.join(activity_list)}."
+				
 				elif key is not username:
 					new_user_state == True
 					return f"Welcome, new adventurer! What is your name?"
 		
 		elif activity_asking_state == True:
+			
 			if "work" in message.content.lower():
 				activity_asking_state = False
 				skill_asking_state = True
-				return f"Great. Select a skill from {skill_dict.keys}."
+				return f"Great. Select a skill from {', '.join(list(skill_dict.keys()))}."
+			
 			else:
-				return f"Please select from: work, ..."
+				return f"Please select from: {', '.join(activity_list)}."
 		
 		elif skill_asking_state == True:
 			if message.content.lower() in skill_dict:
 				skill_asking_state = False
 				chosen_skill = message.content.lower()
+				
 				for key, value in skill_dict.items():
 					if key == chosen_skill:
 						associated_ability = value
-						print(f"associated_ability_score = {associated_ability}")
-				for value in users[username]["ability scores"]:
-						associated_ability_score = value
-						return f"your {associated_ability} score is {associated_ability_score}."
+				
+				associated_ability_score = users[username]["ability scores"][associated_ability]
+				
+			
 
+				if users[username]["skill proficiencies"][chosen_skill] == True:
+					proceed_state = True
+					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are proficient with {chosen_skill}. Confirm? (confirm/cancel)"
+				
+				elif users[username]["skill proficiencies"][chosen_skill] == False:
+					proceed_state = True
+					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are not proficient with {chosen_skill}. Confirm? (confirm/cancel)"
+			
+			else:
+				return f"Please select from: {', '.join(list(skill_dict.keys()))}."
+
+		elif proceed_state == True:
+			if message.content.lower() == "confirm":
+				proceed_state = False
+
+			elif message.content.lower() == "cancel":
+				proceed_state = False
+
+			else:
+				return f"Please select confirm or cancel."
 
 
 
@@ -122,13 +183,6 @@ except Exception as e:
   os.system("kill 1")
 
 
-# downtime_activities_list = ["Work"]
-
-# work_type_list = ["Acrobatics", "Animal Handling", "Arcana", "Athletics", "Deception", "History", "Insight", "Intimidation", "Medicine", "Nature", "Perception", "Performance", "Persuasion", "Religion", "Sleight of Hand", "Stealth", "Survival"]
-
-# spelers = dict()
-
-# ability_score_dictionary = {"Strength": 0, "Dexterity": 0, "Constitution": 0, "Intelligence": 0, "Wisdom": 0, "Charisma": 0}
 
 # def check_wages(roll_result):
 #   if roll_result <= 9:
@@ -139,44 +193,6 @@ except Exception as e:
 #     return "a large gemstone worth 200 VP"
 #   elif roll_result >= 20:
 #     return "a massive gemstone worth 250 VP"
-
-# def work_roll (input):
-#   if input == key:
-#     return f"What is your {key.value} Dexterity modifier?"
-#   elif input == "Animal Handling":
-#     return "What is your Wisdom modifier?"
-#   elif input == "Arcana":
-#     return "What is your Intelligence modifier?"
-#   elif input == "Athletics":
-#     return "What is your Strength modifier?"
-#   elif input == "Deception":
-#     return "What is your Charisma modifier?"
-#   elif input == "History":
-#     return "What is your Intelligence modifier?"
-#   elif input == "Insight":
-#     return "What is your Wisdom modifier?"
-#   elif input == "Intimidation":
-#     return "What is your Charisma modifier?"
-#   elif input == "Investigation":
-#     return "What is your Intelligence modifier?"
-#   elif input == "Medicine":
-#     return "What is your Wisdom modifier?"
-#   elif input == "Nature":
-#     return "What is your Intelligence modifier?"
-#   elif input == "Perception":
-#     return "What is your Wisdom modifier?"
-#   elif input == "Performance":
-#     return "What is your Charisma modifier?"
-#   elif input == "Persuasion":
-#     return "What is your Charisma modifier?"
-#   elif input == "Religion":
-#     return "What is your Intelligence modifier?"
-#   elif input == "Sleight of Hand":
-#     return "What is your Dexterity modifier?"
-#   elif input == "Stealth":
-#     return "What is your Dexterity modifier?"
-#   elif input == "Survival":
-#     return "What is your Wisdom modifier?"
   
 # spelers = ""
 # spelernaam = message.author

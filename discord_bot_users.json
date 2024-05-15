@@ -5,6 +5,10 @@
         "ability scores" : {
             "dexterity" : 15,
             "wisdom" : 10
+        },
+        "skill proficiencies" : {
+            "acrobatics" : true,
+            "animal handling" : false
         }
     },
     "mandraki15_35711" : {
