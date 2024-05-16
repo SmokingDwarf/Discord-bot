@@ -57,13 +57,6 @@ skill_dict = {"acrobatics": "dexterity", "animal handling": "wisdom"}
 def send_message(message):
 	global users
 	global username
-	# global new_user_state
-	#global activity_list
-	#global skill_dict
-	global activity_query
-	global skill_query
-	global proceed_query
-	# global initialize
 
 	username = str(message.author)
 	
