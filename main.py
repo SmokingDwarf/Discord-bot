@@ -3,6 +3,7 @@ import os
 import json
 import discord_user
 import math
+import random
 from random import randint, choice
 
 def reply_to_self(client, user):
@@ -51,13 +52,6 @@ proceed_state = False
 #Lists & dicts
 activity_list = ["work"]
 skill_dict = {"acrobatics": "dexterity", "animal handling": "wisdom"}
-
-def get_ability_modifier(ability_score):	
-	ability_modifier = math.floor((ability_score - 10) / 2)
-
-#def get_proficiency_die():
-	#if level == 
-	#proficiency_die_result=
 
 @reply_to_all(client)
 def send_message(message):
@@ -130,7 +124,13 @@ def send_message(message):
 			else:
 				return f"Please select confirm or cancel."
 
+	def get_ability_modifier(ability_score):	
+		ability_modifier = math.floor((ability_score - 10) / 2)
 
+	def get_proficiency_die():
+		level = users[username]["level"]
+		proficiency_die = (math.ceil(1 + level / 4) * 2)
+		proficiency_die_result = random.randint(1, proficiency_die)
 
 
 # @reply_to_all(client) #tweede stukje code
