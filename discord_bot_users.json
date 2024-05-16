@@ -15,7 +15,7 @@
         "activity_asking_state" : false,
         "new_user_state" : false,
         "skill_asking_state" : false,
-        "proceed_state" : false
+        "roll_state" : false
     },
     "mandraki15_35711" : {
         "name" : "Ush'ga",

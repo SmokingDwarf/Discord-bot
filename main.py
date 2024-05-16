@@ -67,15 +67,16 @@ def send_message(message):
 		elif users[username]["skill_asking_state"] == True:
 			return skill_query(message)
 			
-		elif users[username]["proceed_state"] == True:
-			return proceed_query(message)
+		elif users[username]["roll_state"] == True:
+			return roll_query(message)
 			
-def proceed_query(message):	
+def roll_query(message):	
 	if message.content.lower() == "confirm":
-		users[username]["proceed_state"] = False
+		users[username]["roll_state"] = False
+
 
 	elif message.content.lower() == "cancel":
-		users[username]["proceed_state"] = False
+		users[username]["roll_state"] = False
 
 	else:
 		return f"Please select confirm or cancel."
@@ -100,12 +101,12 @@ def skill_query(message):
 				#Waarom werkte dit niet meer als alles hieronder 1 tab naar links stond?
 				associated_ability_score = users[username]["ability scores"][associated_ability]
 				if users[username]["skill proficiencies"][chosen_skill] == True:
-					users[username]["proceed_state"] = True
-					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are proficient with {chosen_skill}. Confirm? (confirm/cancel)"
+					users[username]["roll_state"] = True
+					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are proficient with {chosen_skill}. Ready? Please type roll or cancel."
 				
 				elif users[username]["skill proficiencies"][chosen_skill] == False:
-					users[username]["proceed_state"] = True
-					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are not proficient with {chosen_skill}. Confirm? (confirm/cancel)"
+					users[username]["roll_state"] = True
+					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are not proficient with {chosen_skill}. Ready? Please type roll or cancel."
 		
 		else:
 			return f"Please select from: {', '.join(list(skill_dict.keys()))}."
@@ -117,6 +118,9 @@ def get_proficiency_die():
 	level = users[username]["level"]
 	proficiency_die = (math.ceil(1 + level / 4) * 2)
 	proficiency_die_result = random.randint(1, proficiency_die)
+
+def get_d20_die():
+	d20_result = random.randint(1, 20)
 
 def initialize():	
 	users[username]["initialize_state"] = False
