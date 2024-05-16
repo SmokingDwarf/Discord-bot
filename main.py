@@ -118,15 +118,17 @@ def roll_query(message):
 		
 		if users[username]["skill proficiencies"][users[username]["chosen_skill"]] == True:
 			check_result = proficient_skill_check()
-
-			return f"The result of your roll is d20 ({users[username]["d20_result"]}) + your {users[username]["associated_ability"]} modifier ({users[username]["ability_modifier"]}) + your proficiency die ({users[username]["proficiency_die_result"]}) = {check_result}! "
+			wages = check_wages(check_result)
+			return f"The result of your roll is d20 ({users[username]["d20_result"]}) + your {users[username]["associated_ability"]} modifier ({users[username]["ability_modifier"]}) + your proficiency die ({users[username]["proficiency_die_result"]}) = {check_result}! Your reward is {wages}."
 		
 		elif users[username]["skill proficiencies"][users[username]["chosen_skill"]] == False:
 			check_result = not_proficient_skill_check()
-			return f"The result of your roll is d20 ({users[username]["d20_result"]}) + your {users[username]["associated_ability"]} modifier ({users[username]["ability_modifier"]}) = {check_result}! "
+			check_wages(check_result)
+			return f"The result of your roll is d20 ({users[username]["d20_result"]}) + your {users[username]["associated_ability"]} modifier ({users[username]["ability_modifier"]}) = {check_result}! Your reward is {wages}."
 		
 	elif "cancel" in message.content.lower() and "roll" not in message.content.lower():
 		users[username]["roll_state"] = False
+		users[username]["activity_asking_state"] = True
 		return f"Select a downtime activity from: {', '.join(activity_list)}."
 	
 	else:
@@ -154,19 +156,19 @@ def not_proficient_skill_check():
 	users[username]["ability_modifier"] = get_ability_modifier(users[username]["associated_ability_score"])
 	return users[username]["d20_result"] + users[username]["ability_modifier"]
 
-# def check_wages(check_result):
-# 	if check_result <= 5:
-# 		return f"a small, uncut gemstone worth 10 VP"
-# 	elif check_result >= 5 and check_result <= 9:
-# 		return f"a small, cut gemstone worth 25 VP"
-# 	elif check_result >= 10 and check_result <= 14:
-# 		return f"a medium, uncut gemstone worth 50 VP"		
-# 	elif check_result >= 15 and check_result <= 19:			
-# 		return f"a medium, cut gemstone worth 100 VP"
-# 	elif check_result >= 20 and check_result <= 24:
-# 		return f"a large, uncut gemstone worth 250 VP"
-# 	elif check_result >= 25:
-# 		return f"a large, cut gemstone worth 500 VP"
+def check_wages(check_result):
+	if check_result <= 5:
+		return f"a small, uncut gemstone worth 10 VP"
+	elif check_result >= 5 and check_result <= 9:
+		return f"a small, cut gemstone worth 25 VP"
+	elif check_result >= 10 and check_result <= 14:
+		return f"a medium, uncut gemstone worth 50 VP"		
+	elif check_result >= 15 and check_result <= 19:			
+		return f"a medium, cut gemstone worth 100 VP"
+	elif check_result >= 20 and check_result <= 24:
+		return f"a large, uncut gemstone worth 250 VP"
+	elif check_result >= 25:
+		return f"a large, cut gemstone worth 500 VP"
 
 try:
   print("De bot is online.")
