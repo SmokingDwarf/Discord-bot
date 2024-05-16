@@ -44,13 +44,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
 
-#States
-# initialize_state = True
-# activity_asking_state = False
-# new_user_state = False
-# skill_asking_state = False
-# proceed_state = False
-
 #Lists & dicts
 activity_list = ["work"]
 skill_dict = {"acrobatics": "dexterity", "animal handling": "wisdom"}
@@ -88,8 +81,6 @@ def proceed_query(message):
 		return f"Please select confirm or cancel."
 	
 def activity_query(message):
-	# global activity_asking_state
-	# global skill_asking_state
 	if "work" in message.content.lower():
 		users[username]["activity_asking_state"] = False
 		users[username]["skill_asking_state"] = True
@@ -99,8 +90,6 @@ def activity_query(message):
 		return f"Please select from: {', '.join(activity_list)}."
 
 def skill_query(message):
-	# global skill_asking_state
-	# global proceed_state
 	if message.content.lower() in skill_dict:
 		users[username]["skill_asking_state"] = False
 		chosen_skill = message.content.lower()
@@ -130,8 +119,6 @@ def get_proficiency_die():
 	proficiency_die_result = random.randint(1, proficiency_die)
 
 def initialize():	
-	# global initialize_state
-	# global activity_asking_state
 	users[username]["initialize_state"] = False
 	for key, value in users.items():
 		
