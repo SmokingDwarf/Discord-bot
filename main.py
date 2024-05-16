@@ -69,58 +69,6 @@ def send_message(message):
 			
 		elif users[username]["roll_state"] == True:
 			return roll_query(message)
-			
-def roll_query(message):	
-	if message.content.lower() == "confirm":
-		users[username]["roll_state"] = False
-
-
-	elif message.content.lower() == "cancel":
-		users[username]["roll_state"] = False
-
-	else:
-		return f"Please select confirm or cancel."
-	
-def activity_query(message):
-	if "work" in message.content.lower():
-		users[username]["activity_asking_state"] = False
-		users[username]["skill_asking_state"] = True
-		return f"Great. Select a skill from {', '.join(list(skill_dict.keys()))}."
-		
-	else:
-		return f"Please select from: {', '.join(activity_list)}."
-
-def skill_query(message):
-	if message.content.lower() in skill_dict:
-		users[username]["skill_asking_state"] = False
-		chosen_skill = message.content.lower()
-			
-		for key, value in skill_dict.items():
-			if key == chosen_skill:
-				associated_ability = value
-				#Waarom werkte dit niet meer als alles hieronder 1 tab naar links stond?
-				associated_ability_score = users[username]["ability scores"][associated_ability]
-				if users[username]["skill proficiencies"][chosen_skill] == True:
-					users[username]["roll_state"] = True
-					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are proficient with {chosen_skill}. Ready? Please type roll or cancel."
-				
-				elif users[username]["skill proficiencies"][chosen_skill] == False:
-					users[username]["roll_state"] = True
-					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are not proficient with {chosen_skill}. Ready? Please type roll or cancel."
-		
-		else:
-			return f"Please select from: {', '.join(list(skill_dict.keys()))}."
-
-def get_ability_modifier(ability_score):	
-	ability_modifier = math.floor((ability_score - 10) / 2)
-
-def get_proficiency_die():
-	level = users[username]["level"]
-	proficiency_die = (math.ceil(1 + level / 4) * 2)
-	proficiency_die_result = random.randint(1, proficiency_die)
-
-def get_d20_die():
-	d20_result = random.randint(1, 20)
 
 def initialize():	
 	users[username]["initialize_state"] = False
@@ -133,22 +81,92 @@ def initialize():
 		elif key is not username:
 			users[username]["new_user_state"] == True
 			return f"Welcome, new adventurer! What is your name?"
+	
+def activity_query(message):
+	if message.content.lower() in activity_list:
+		users[username]["activity_asking_state"] = False
+		users[username]["skill_asking_state"] = True
+		return f"Great. Select a skill from {', '.join(list(skill_dict.keys()))}."
+		
+	else:
+		return f"Please select from: {', '.join(activity_list)}."
 
-# @reply_to_all(client) #tweede stukje code
-# def check_wages(message):
-# 	try:
-# 		roll_result = int(message.content)
-# 		if roll_result <= 9:
-# 			return "a small gemstone worth 20 VP"
-# 		elif roll_result >= 10 and roll_result <= 14:
-# 			return "a medium gemstone worth 100 VP"
-# 		elif roll_result >= 15 and roll_result <= 19:
-# 			return "a large gemstone worth 200 VP"
-# 		elif roll_result >= 20:
-# 			return "a massive gemstone worth 250 VP"
-# 	except:
-# 		return
+def skill_query(message):
+	if message.content.lower() in skill_dict:
+		users[username]["skill_asking_state"] = False
+		users[username]["chosen_skill"] = message.content.lower()
+			
+		for key, value in skill_dict.items():
+			if key == users[username]["chosen_skill"]:
+				users[username]["associated_ability"] = value
+				users[username]["associated_ability_score"] = users[username]["ability scores"][users[username]["associated_ability"]]
+				
+				if users[username]["skill proficiencies"][users[username]["chosen_skill"]] == True:
+					users[username]["roll_state"] = True
+					return f"{users[username]["chosen_skill"].capitalize()} is a {users[username]["associated_ability"]} skill. Your {users[username]["associated_ability"]} score is {users[username]["associated_ability_score"]}. You are proficient with {users[username]["chosen_skill"]}. Ready? Please type roll or cancel."
+				
+				elif users[username]["skill proficiencies"][users[username]["chosen_skill"]] == False:
+					users[username]["roll_state"] = True
+					return f"{users[username]["chosen_skill"].capitalize()} is a {users[username]["associated_ability"]} skill. Your {users[username]["associated_ability"]} score is {users[username]["associated_ability_score"]}. You are not proficient with {users[username]["chosen_skill"]}. Ready? Please type roll or cancel."
+		
+		else:
+			return f"Please select from: {', '.join(list(skill_dict.keys()))}."
 
+def roll_query(message):	
+	if "roll" in message.content.lower() and "cancel" not in message.content.lower():
+		users[username]["roll_state"] = False
+		
+		if users[username]["skill proficiencies"][users[username]["chosen_skill"]] == True:
+			check_result = proficient_skill_check()
+
+			return f"The result of your roll is d20 ({users[username]["d20_result"]}) + your {users[username]["associated_ability"]} modifier ({users[username]["ability_modifier"]}) + your proficiency die ({users[username]["proficiency_die_result"]}) = {check_result}! "
+		
+		elif users[username]["skill proficiencies"][users[username]["chosen_skill"]] == False:
+			check_result = not_proficient_skill_check()
+			return f"The result of your roll is d20 ({users[username]["d20_result"]}) + your {users[username]["associated_ability"]} modifier ({users[username]["ability_modifier"]}) = {check_result}! "
+		
+	elif "cancel" in message.content.lower() and "roll" not in message.content.lower():
+		users[username]["roll_state"] = False
+		return f"Select a downtime activity from: {', '.join(activity_list)}."
+	
+	else:
+		return f"Please select roll or cancel."
+
+def get_ability_modifier(ability_score):	
+	return math.floor((ability_score - 10) / 2)
+
+def get_proficiency_die():
+	level = users[username]["level"]
+	proficiency_die = (math.ceil(1 + level / 4) * 2)
+	return random.randint(1, proficiency_die)
+
+def get_d20_die():
+	return random.randint(1, 20)
+
+def proficient_skill_check():
+	users[username]["d20_result"] = get_d20_die()
+	users[username]["ability_modifier"] = get_ability_modifier(users[username]["associated_ability_score"])
+	users[username]["proficiency_die_result"] = get_proficiency_die()
+	return users[username]["d20_result"] + users[username]["ability_modifier"] + users[username]["proficiency_die_result"]
+
+def not_proficient_skill_check():
+	users[username]["d20_result"] = get_d20_die()
+	users[username]["ability_modifier"] = get_ability_modifier(users[username]["associated_ability_score"])
+	return users[username]["d20_result"] + users[username]["ability_modifier"]
+
+# def check_wages(check_result):
+# 	if check_result <= 5:
+# 		return f"a small, uncut gemstone worth 10 VP"
+# 	elif check_result >= 5 and check_result <= 9:
+# 		return f"a small, cut gemstone worth 25 VP"
+# 	elif check_result >= 10 and check_result <= 14:
+# 		return f"a medium, uncut gemstone worth 50 VP"		
+# 	elif check_result >= 15 and check_result <= 19:			
+# 		return f"a medium, cut gemstone worth 100 VP"
+# 	elif check_result >= 20 and check_result <= 24:
+# 		return f"a large, uncut gemstone worth 250 VP"
+# 	elif check_result >= 25:
+# 		return f"a large, cut gemstone worth 500 VP"
 
 try:
   print("De bot is online.")
