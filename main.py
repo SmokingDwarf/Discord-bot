@@ -55,13 +55,16 @@ skill_dict = {"acrobatics": "dexterity", "animal handling": "wisdom"}
 
 @reply_to_all(client)
 def send_message(message):
-	global initialize_state
-	global activity_asking_state
-	global new_user_state
-	global skill_asking_state
-	global activity_list
-	global skill_dict
-	global proceed_state
+	global users
+	global username
+	# global new_user_state
+	#global activity_list
+	#global skill_dict
+	global activity_query
+	global skill_query
+	global proceed_query
+	# global initialize
+
 	username = str(message.author)
 	
 	if message.content and message.channel.name == 'michs-bot':
@@ -69,69 +72,84 @@ def send_message(message):
 			users = json.load(file)
 		
 		if initialize_state == True:
-			initialize_state = False
-			for key, value in users.items():
-				
-				if key == username:
-					activity_asking_state = True
-					return f"Hello {(users[key]["name"])}! Select a downtime activity from: {', '.join(activity_list)}."
-				
-				elif key is not username:
-					new_user_state == True
-					return f"Welcome, new adventurer! What is your name?"
-		
+			return initialize()
+
 		elif activity_asking_state == True:
+			return activity_query(message)
 			
-			if "work" in message.content.lower():
-				activity_asking_state = False
-				skill_asking_state = True
-				return f"Great. Select a skill from {', '.join(list(skill_dict.keys()))}."
-			
-			else:
-				return f"Please select from: {', '.join(activity_list)}."
-		
 		elif skill_asking_state == True:
-			if message.content.lower() in skill_dict:
-				skill_asking_state = False
-				chosen_skill = message.content.lower()
-				
-				for key, value in skill_dict.items():
-					if key == chosen_skill:
-						associated_ability = value
-				
-				associated_ability_score = users[username]["ability scores"][associated_ability]
-				
+			return skill_query(message)
 			
-
-				if users[username]["skill proficiencies"][chosen_skill] == True:
-					proceed_state = True
-					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are proficient with {chosen_skill}. Confirm? (confirm/cancel)"
-				
-				elif users[username]["skill proficiencies"][chosen_skill] == False:
-					proceed_state = True
-					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are not proficient with {chosen_skill}. Confirm? (confirm/cancel)"
-			
-			else:
-				return f"Please select from: {', '.join(list(skill_dict.keys()))}."
-
 		elif proceed_state == True:
-			if message.content.lower() == "confirm":
-				proceed_state = False
+			return proceed_query(message)
+			
+def proceed_query(message):	
+	global proceed_state
+	if message.content.lower() == "confirm":
+		proceed_state = False
 
-			elif message.content.lower() == "cancel":
-				proceed_state = False
+	elif message.content.lower() == "cancel":
+		proceed_state = False
 
-			else:
-				return f"Please select confirm or cancel."
+	else:
+		return f"Please select confirm or cancel."
+	
+def activity_query(message):
+	global activity_asking_state
+	global skill_asking_state
+	if "work" in message.content.lower():
+		activity_asking_state = False
+		skill_asking_state = True
+		return f"Great. Select a skill from {', '.join(list(skill_dict.keys()))}."
+		
+	else:
+		return f"Please select from: {', '.join(activity_list)}."
 
-	def get_ability_modifier(ability_score):	
-		ability_modifier = math.floor((ability_score - 10) / 2)
+def skill_query(message):
+	global skill_asking_state
+	global proceed_state
+	if message.content.lower() in skill_dict:
+		skill_asking_state = False
+		chosen_skill = message.content.lower()
+			
+		for key, value in skill_dict.items():
+			if key == chosen_skill:
+				associated_ability = value
+			
+			associated_ability_score = users[username]["ability scores"][associated_ability]
+			
+			if users[username]["skill proficiencies"][chosen_skill] == True:
+				proceed_state = True
+				return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are proficient with {chosen_skill}. Confirm? (confirm/cancel)"
+			
+			elif users[username]["skill proficiencies"][chosen_skill] == False:
+				proceed_state = True
+				return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are not proficient with {chosen_skill}. Confirm? (confirm/cancel)"
+		
+		else:
+			return f"Please select from: {', '.join(list(skill_dict.keys()))}."
 
-	def get_proficiency_die():
-		level = users[username]["level"]
-		proficiency_die = (math.ceil(1 + level / 4) * 2)
-		proficiency_die_result = random.randint(1, proficiency_die)
+def get_ability_modifier(ability_score):	
+	ability_modifier = math.floor((ability_score - 10) / 2)
 
+def get_proficiency_die():
+	level = users[username]["level"]
+	proficiency_die = (math.ceil(1 + level / 4) * 2)
+	proficiency_die_result = random.randint(1, proficiency_die)
+
+def initialize():	
+	global initialize_state
+	global activity_asking_state
+	initialize_state = False
+	for key, value in users.items():
+		
+		if key == username:
+			activity_asking_state = True
+			return f"Hello {(users[key]["name"])}! Select a downtime activity from: {', '.join(activity_list)}."
+			
+		elif key is not username:
+			new_user_state == True
+			return f"Welcome, new adventurer! What is your name?"
 
 # @reply_to_all(client) #tweede stukje code
 # def check_wages(message):
