@@ -5,6 +5,8 @@ import discord_user
 import math
 import random
 from random import randint, choice
+with open ("discord_bot_users.json", "r") as file:
+			users = json.load(file)
 
 def reply_to_self(client, user):
 	id = user
@@ -43,11 +45,11 @@ intents.message_content = True
 client = discord.Client(intents=intents)
 
 #States
-initialize_state = True
-activity_asking_state = False
-new_user_state = False
-skill_asking_state = False
-proceed_state = False
+# initialize_state = True
+# activity_asking_state = False
+# new_user_state = False
+# skill_asking_state = False
+# proceed_state = False
 
 #Lists & dicts
 activity_list = ["work"]
@@ -61,63 +63,60 @@ def send_message(message):
 	username = str(message.author)
 	
 	if message.content and message.channel.name == 'michs-bot':
-		with open ("discord_bot_users.json", "r") as file:
-			users = json.load(file)
 		
-		if initialize_state == True:
+		
+		if users[username]["initialize_state"] == True:
 			return initialize()
 
-		elif activity_asking_state == True:
+		elif users[username]["activity_asking_state"] == True:
 			return activity_query(message)
 			
-		elif skill_asking_state == True:
+		elif users[username]["skill_asking_state"] == True:
 			return skill_query(message)
 			
-		elif proceed_state == True:
+		elif users[username]["proceed_state"] == True:
 			return proceed_query(message)
 			
 def proceed_query(message):	
-	global proceed_state
 	if message.content.lower() == "confirm":
-		proceed_state = False
+		users[username]["proceed_state"] = False
 
 	elif message.content.lower() == "cancel":
-		proceed_state = False
+		users[username]["proceed_state"] = False
 
 	else:
 		return f"Please select confirm or cancel."
 	
 def activity_query(message):
-	global activity_asking_state
-	global skill_asking_state
+	# global activity_asking_state
+	# global skill_asking_state
 	if "work" in message.content.lower():
-		activity_asking_state = False
-		skill_asking_state = True
+		users[username]["activity_asking_state"] = False
+		users[username]["skill_asking_state"] = True
 		return f"Great. Select a skill from {', '.join(list(skill_dict.keys()))}."
 		
 	else:
 		return f"Please select from: {', '.join(activity_list)}."
 
 def skill_query(message):
-	global skill_asking_state
-	global proceed_state
+	# global skill_asking_state
+	# global proceed_state
 	if message.content.lower() in skill_dict:
-		skill_asking_state = False
+		users[username]["skill_asking_state"] = False
 		chosen_skill = message.content.lower()
 			
 		for key, value in skill_dict.items():
 			if key == chosen_skill:
 				associated_ability = value
-			
-			associated_ability_score = users[username]["ability scores"][associated_ability]
-			
-			if users[username]["skill proficiencies"][chosen_skill] == True:
-				proceed_state = True
-				return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are proficient with {chosen_skill}. Confirm? (confirm/cancel)"
-			
-			elif users[username]["skill proficiencies"][chosen_skill] == False:
-				proceed_state = True
-				return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are not proficient with {chosen_skill}. Confirm? (confirm/cancel)"
+				#Waarom werkte dit niet meer als alles hieronder 1 tab naar links stond?
+				associated_ability_score = users[username]["ability scores"][associated_ability]
+				if users[username]["skill proficiencies"][chosen_skill] == True:
+					users[username]["proceed_state"] = True
+					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are proficient with {chosen_skill}. Confirm? (confirm/cancel)"
+				
+				elif users[username]["skill proficiencies"][chosen_skill] == False:
+					users[username]["proceed_state"] = True
+					return f"{chosen_skill.capitalize()} is a {associated_ability} skill. Your {associated_ability} score is {associated_ability_score}. You are not proficient with {chosen_skill}. Confirm? (confirm/cancel)"
 		
 		else:
 			return f"Please select from: {', '.join(list(skill_dict.keys()))}."
@@ -131,17 +130,17 @@ def get_proficiency_die():
 	proficiency_die_result = random.randint(1, proficiency_die)
 
 def initialize():	
-	global initialize_state
-	global activity_asking_state
-	initialize_state = False
+	# global initialize_state
+	# global activity_asking_state
+	users[username]["initialize_state"] = False
 	for key, value in users.items():
 		
 		if key == username:
-			activity_asking_state = True
+			users[username]["activity_asking_state"] = True
 			return f"Hello {(users[key]["name"])}! Select a downtime activity from: {', '.join(activity_list)}."
 			
 		elif key is not username:
-			new_user_state == True
+			users[username]["new_user_state"] == True
 			return f"Welcome, new adventurer! What is your name?"
 
 # @reply_to_all(client) #tweede stukje code
