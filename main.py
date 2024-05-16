@@ -2,6 +2,7 @@ import discord # type: ignore
 import os
 import json
 import discord_user
+import math
 from random import randint, choice
 
 def reply_to_self(client, user):
@@ -52,38 +53,11 @@ activity_list = ["work"]
 skill_dict = {"acrobatics": "dexterity", "animal handling": "wisdom"}
 
 def get_ability_modifier(ability_score):	
-	if ability_score == 1:
-		ability_modifier = -5
-	elif ability_score == 2 or ability_score == 3:
-		ability_modifier = -4
-	elif ability_score == 4 or ability_score == 5:
-		ability_modifier = -3
-	elif ability_score == 6 or ability_score == 7:
-		ability_modifier = -2
-	elif ability_score == 8 or ability_score == 9:
-		ability_modifier = -1
-	elif ability_score == 10 or ability_score == 11:
-		ability_modifier = 0
-	elif ability_score == 12 or ability_score == 13:
-		ability_modifier = 1
-	elif ability_score == 14 or ability_score == 15:
-		ability_modifier = 2
-	elif ability_score == 16 or ability_score == 17:
-		ability_modifier = 3
-	elif ability_score == 18 or ability_score == 19:
-		ability_modifier = 4
-	elif ability_score == 20 or ability_score == 21:
-		ability_modifier = 5
-	elif ability_score == 22 or ability_score == 23:
-		ability_modifier = 6
-	elif ability_score == 24 or ability_score == 25:
-		ability_modifier = 7
-	elif ability_score == 26 or ability_score == 27:
-		ability_modifier = 8
-	elif ability_score == 28 or ability_score == 29:
-		ability_modifier = 9
-	elif ability_score == 30:
-		ability_modifier = 10
+	ability_modifier = math.floor((ability_score - 10) / 2)
+
+#def get_proficiency_die():
+	#if level == 
+	#proficiency_die_result=
 
 @reply_to_all(client)
 def send_message(message):

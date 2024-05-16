@@ -2,6 +2,7 @@
     "mich5613" : {
         "name" : "Heracles", 
         "class" : "Champion",
+        "level" : 1,
         "ability scores" : {
             "dexterity" : 15,
             "wisdom" : 10
