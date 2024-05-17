@@ -67,6 +67,9 @@ def send_message(message):
 		elif users[username]["confirm_name_state"] == True:
 			return confirm_name(message)
 		
+		elif users[username]["name_query_state"] == True:
+			return name_query(message)
+
 		elif users[username]["activity_asking_state"] == True:
 			return activity_query(message)
 			
@@ -113,18 +116,23 @@ def register_new_user(message):
 
 def confirm_name(message):
 	if "confirm" in message.content.lower():
-
+		users[username]["confirm_name_state"] = False
+		users[username]["initialize_state"] = True
 		# Continue
 
 	elif "cancel" in message.content.lower():
 		users[username]["name"] = None
+		users[username]["confirm_name_state"] = False
 		users[username]["name_query_state"] = True
 		return f"Please enter your character's name."
 	else:
 		return f'Please select confirm or cancel.'
 
 def name_query(message):
-
+	users[username]["name"] = message.content.capitalize()
+	users[username]["confirm_name_state"] = True
+	users[username]["name_query_state"] = False
+	return f'You have entered the character name: {users[username]["name"]}. Please confirm that this is your character name. Select confirm or cancel.'
 
 def activity_query(message):
 	if message.content.lower() in activity_list:
