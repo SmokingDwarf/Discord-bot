@@ -56,41 +56,40 @@ def send_message(message):
 	username = str(message.author)
 	
 	if message.content and message.channel.name == 'michs-bot':
-		
-		
-		if users[username]["initialize_state"] == True:
-			return initialize()
+		for key, value in users.items():	
+			if key == username:
+				
+				if users[username]["initialize_state"] == True:
+					return initialize()
+				
+				elif users[username]["new_user_state"] == True:
+					return register_new_user(message)
 
-		elif users[username]["new_user_state"] == True:
-			return register_new_user(message)
-		
-		elif users[username]["confirm_name_state"] == True:
-			return confirm_name(message)
-		
-		elif users[username]["name_query_state"] == True:
-			return name_query(message)
+				elif users[username]["confirm_name_state"] == True:
+					return confirm_name(message)
 
-		elif users[username]["activity_asking_state"] == True:
-			return activity_query(message)
-			
-		elif users[username]["skill_asking_state"] == True:
-			return skill_query(message)
-			
-		elif users[username]["roll_state"] == True:
-			return roll_query(message)
+				elif users[username]["name_query_state"] == True:
+					return name_query(message)
+
+				elif users[username]["activity_asking_state"] == True:
+					return activity_query(message)
+
+				elif users[username]["skill_asking_state"] == True:
+					return skill_query(message)
+
+				elif users[username]["roll_state"] == True:
+					return roll_query(message)
+
+			else:
+				users = {}
+				users[username] = {}
+				users[username]["new_user_state"] = True
+				return f"Welcome, new adventurer! What is your character's name?"
 
 def initialize():	
 	users[username]["initialize_state"] = False
-	for key, value in users.items():
-		
-		if key == username:
-			users[username]["activity_asking_state"] = True
-			name = (users[key]["name"])
-			return f"Hello {name}! Select a downtime activity from: {', '.join(activity_list)}."
-			
-		elif key is not username:
-			users[username]["new_user_state"] = True
-			return f"Welcome, new adventurer! What is your character's name?"
+	users[username]["activity_asking_state"] = True
+	return f"Hello {users[username]['name']}! Select a downtime activity from: {', '.join(activity_list)}."
 
 def register_new_user(message):
 	users[username]["name"] = message.content.capitalize()
