@@ -62,7 +62,10 @@ def send_message(message):
 			return initialize()
 
 		elif users[username]["new_user_state"] == True:
-			return register_new_user()
+			return register_new_user(message)
+		
+		elif users[username]["confirm_name_state"] == True:
+			return confirm_name(message)
 		
 		elif users[username]["activity_asking_state"] == True:
 			return activity_query(message)
@@ -84,22 +87,44 @@ def initialize():
 			
 		elif key is not username:
 			users[username]["new_user_state"] = True
-			return f"Welcome, new adventurer! What is your name?"
+			return f"Welcome, new adventurer! What is your character's name?"
 
-def register_new_user():
+def register_new_user(message):
+	users[username]["name"] = message.content.capitalize()
+	# Add states
 	users[username]["new_user_state"] = False
-	users[username]["initialize_state"] = None
-	users[username]["initialize_state"] = True
+	users[username]["initialize_state"] = False
 	users[username]["activity_asking_state"] = False
 	users[username]["new_user_state"] = False
 	users[username]["skill_asking_state"] = False
 	users[username]["roll_state"] = False
+	users[username]["name_query_state"] = False
+	# Add variables
 	users[username]["associated_ability"] = None
 	users[username]["associated_ability_score"] = None
 	users[username]["chosen_skill"] = None
 	users[username]["ability_modifier"] = None
 	users[username]["proficiency_die_result"] = None
 	users[username]["d20_result"] = None
+	
+	users[username]["confirm_name_state"] = True
+	return f'You have entered the character name: {users[username]["name"]}. Please confirm that this is your character name. Select confirm or cancel.'
+
+
+def confirm_name(message):
+	if "confirm" in message.content.lower():
+
+		# Continue
+
+	elif "cancel" in message.content.lower():
+		users[username]["name"] = None
+		users[username]["name_query_state"] = True
+		return f"Please enter your character's name."
+	else:
+		return f'Please select confirm or cancel.'
+
+def name_query(message):
+
 
 def activity_query(message):
 	if message.content.lower() in activity_list:
