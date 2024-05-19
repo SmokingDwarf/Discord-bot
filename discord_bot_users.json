@@ -1,30 +1,30 @@
 {
-    "test_mich5613" : {
-        "name" : "Heracles", 
-        "class" : "Champion",
-        "level" : 1,
-        "ability scores" : {
-            "dexterity" : 15,
-            "wisdom" : 10
+    "test_mich5613": {
+        "name": "Heracles",
+        "class": "Champion",
+        "level": 1,
+        "ability scores": {
+            "dexterity": 15,
+            "wisdom": 10
         },
-        "skill proficiencies" : {
-            "acrobatics" : true,
-            "animal handling" : false
+        "skill proficiencies": {
+            "acrobatics": true,
+            "animal handling": false
         },
-        "initialize_state" : true,
-        "activity_asking_state" : false,
-        "new_user_state" : false,
-        "skill_asking_state" : false,
-        "roll_state" : false,
-        "associated_ability" : null,
-        "associated_ability_score" : null,
-        "chosen_skill" : null,
-        "ability_modifier" : null,
-        "proficiency_die_result" : null,
-        "d20_result" : null
+        "initialize_state": true,
+        "activity_asking_state": false,
+        "new_user_state": false,
+        "skill_asking_state": false,
+        "roll_state": false,
+        "associated_ability": null,
+        "associated_ability_score": null,
+        "chosen_skill": null,
+        "ability_modifier": null,
+        "proficiency_die_result": null,
+        "d20_result": null
     },
-    "mandraki15_35711" : {
-        "name" : "Ush'ga",
-        "class" : "Mystic"
-    } 
+    "mandraki15_35711": {
+        "name": "Ush'ga",
+        "class": "Mystic"
+    }
 }
