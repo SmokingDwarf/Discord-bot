@@ -69,18 +69,21 @@ def send_message(message):
 				return run_program
 		
 		if username not in users:
-			print("de fout ligt op lijn 66")
 			users[username] = {}
 			users[username] = {
-				"new_user_state" : True, 
+				"name" : "",
+				"class" : "",
+				"level" : 0,
+				"ability_scores" : {},
+				"skill_proficiencies" : {},
 				"initialize_state" : False, 
-				"confirm_name_state" : False, 
-				"activity_asking_state" : False, 
-				"skill_asking_state" : False, 
+				"activity_query_state" : False,
+				"new_user_state" : True, 
+				"skill_query_state" : False, 			
 				"roll_state" : False, 
 				"name_query_state" : False,
-				"ability_scores" : {},
-				"skill_proficiencies" : {}
+				"level_query_state" : False,
+				"chosen_skill" : None,
 			}
 			return f"Welcome, new adventurer! What is your character's name?"
 
@@ -97,16 +100,16 @@ def state_func(message):
 	elif users[username]["new_user_state"] == True:
 		return register_new_user(message)
 
-	elif users[username]["confirm_name_state"] == True:
-		return confirm_name(message)
+	elif users[username]["level_query_state"] == True:
+		return level_query(message)
 
 	elif users[username]["name_query_state"] == True:
 		return name_query(message)
 
-	elif users[username]["activity_asking_state"] == True:
+	elif users[username]["activity_query_state"] == True:
 		return activity_query(message)
 
-	elif users[username]["skill_asking_state"] == True:
+	elif users[username]["skill_query_state"] == True:
 		return skill_query(message)
 
 	elif users[username]["roll_state"] == True:
@@ -115,39 +118,44 @@ def state_func(message):
 def initialize():	
 	'''Welcome returning user and ask user to select an activity from activity_list'''
 	users[username]["initialize_state"] = False
-	users[username]["activity_asking_state"] = True
+	users[username]["activity_query_state"] = True
 	return f"Hello {users[username]['name']}! Select a downtime activity from: {', '.join(activity_list)}."
 
 def register_new_user(message):
-	'''Set the user's message as their new name, and confirm the name with the user.'''
-	users[username] = {"name" : message.content.capitalize(), "associated_ability" : None, "associated_ability_score" : None, "chosen_skill" : None, "ability_modifier" : None, "proficiency_die_result" : None, "d20_result" : None, "register_new_user" : None, "register_new_user" : False, "confirm_name_state" : True}
-	return f'You have entered the character name: {users[username]["name"]}. Please confirm that this is your character name. Select confirm or cancel.'
+	'''Set the user's message as their new name, and confirm the name with the user,
+	then proceed to ask the user's level.'''
+	users[username]["name"] = message.content.capitalize()
+	users[username]["register_new_user"] = False
+	users[username]["level_query_state"] = True
+	return f'You have entered the character name: {users[username]["name"]}. Continue by entering your level, or cancel to change your name.'
 
-def confirm_name(message):
-	'''Geef de naam terug en check met de user of de naam correct is. Ga daarna verder.'''
-	if "confirm" in message.content.lower():
-		users[username]["confirm_name_state"] = False
+def level_query(message):
+	'''Ask level, or let the user cancel.'''
+	if int(message.content) >= 0 and int(message.content) <= 20:
+		users[username]["level"] = int(message.content)
+		users[username]["level_query_state"] = False
 		users[username]["initialize_state"] = True
-		# Continue
+		return f'Great. Your level is {users[username]["level"]}'
 
 	elif "cancel" in message.content.lower():
 		users[username]["name"] = None
-		users[username]["confirm_name_state"] = False
+		users[username]["level_query_state"] = False
 		users[username]["name_query_state"] = True
 		return f"Please enter your character's name."
+	
 	else:
-		return f'Please select confirm or cancel.'
+		return f"Please enter a number between 1 and 20, or enter 'cancel'."
 
 def name_query(message):
 	users[username]["name"] = message.content.capitalize()
-	users[username]["confirm_name_state"] = True
+	users[username]["level_query_state"] = True
 	users[username]["name_query_state"] = False
 	return f'You have entered the character name: {users[username]["name"]}. Please confirm that this is your character name. Select confirm or cancel.'
 
 def activity_query(message):
 	if message.content.lower() in activity_list:
-		users[username]["activity_asking_state"] = False
-		users[username]["skill_asking_state"] = True
+		users[username]["activity_query_state"] = False
+		users[username]["skill_query_state"] = True
 		return f"Great. Select a skill from {', '.join(list(skill_dict.keys()))}."
 		
 	else:
@@ -155,7 +163,7 @@ def activity_query(message):
 
 def skill_query(message):
 	if message.content.lower() in skill_dict:
-		users[username]["skill_asking_state"] = False
+		users[username]["skill_query_state"] = False
 		
 		skill = message.content.lower()
 		users[username]["chosen_skill"] = skill
@@ -197,7 +205,7 @@ def roll_query(message):
 	elif "cancel" in message.content.lower() and "roll" not in message.content.lower():
 		users[username]["chosen_skill"] = None
 		users[username]["roll_state"] = False
-		users[username]["skill_asking_state"] = True
+		users[username]["skill_query_state"] = True
 		return f"Select a skill from {', '.join(list(skill_dict.keys()))}."
 	
 	else:
