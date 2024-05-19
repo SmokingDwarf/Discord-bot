@@ -52,39 +52,46 @@ skill_dict = {"acrobatics": "dexterity", "animal handling": "wisdom"}
 def send_message(message):
 	global users
 	global username
-
 	username = str(message.author)
 	
 	if message.content and message.channel.name == 'michs-bot':
+		
 		for key, value in users.items():	
 			if key == username:
-				
-				if users[username]["initialize_state"] == True:
-					return initialize()
-				
-				elif users[username]["new_user_state"] == True:
-					return register_new_user(message)
+				run_program = state_func(message)
+				# update_info()
+				return run_program
+		
+		if username not in users:
+			users[username] = {}
+			users[username] = {"new_user_state" : True, "initialize_state" : False, "confirm_name_state" : False, "activity_asking_state" : False, "skill_asking_state" : False, "roll_state" : False, "name_query_state" : False}
+			return f"Welcome, new adventurer! What is your character's name?"
 
-				elif users[username]["confirm_name_state"] == True:
-					return confirm_name(message)
+# def update_info():
+	# with open ("discord_bot_users.json", "w") as file:
+	# 	file.write(json.dumps(users, indent=4))
 
-				elif users[username]["name_query_state"] == True:
-					return name_query(message)
+def state_func(message):
+	if users[username]["initialize_state"] == True:
+		return initialize()
+	
+	elif users[username]["new_user_state"] == True:
+		return register_new_user(message)
 
-				elif users[username]["activity_asking_state"] == True:
-					return activity_query(message)
+	elif users[username]["confirm_name_state"] == True:
+		return confirm_name(message)
 
-				elif users[username]["skill_asking_state"] == True:
-					return skill_query(message)
+	elif users[username]["name_query_state"] == True:
+		return name_query(message)
 
-				elif users[username]["roll_state"] == True:
-					return roll_query(message)
+	elif users[username]["activity_asking_state"] == True:
+		return activity_query(message)
 
-			else:
-				users = {}
-				users[username] = {}
-				users[username]["new_user_state"] = True
-				return f"Welcome, new adventurer! What is your character's name?"
+	elif users[username]["skill_asking_state"] == True:
+		return skill_query(message)
+
+	elif users[username]["roll_state"] == True:
+		return roll_query(message)
 
 def initialize():	
 	users[username]["initialize_state"] = False
@@ -92,24 +99,7 @@ def initialize():
 	return f"Hello {users[username]['name']}! Select a downtime activity from: {', '.join(activity_list)}."
 
 def register_new_user(message):
-	users[username]["name"] = message.content.capitalize()
-	# Add states
-	users[username]["new_user_state"] = False
-	users[username]["initialize_state"] = False
-	users[username]["activity_asking_state"] = False
-	users[username]["new_user_state"] = False
-	users[username]["skill_asking_state"] = False
-	users[username]["roll_state"] = False
-	users[username]["name_query_state"] = False
-	# Add variables
-	users[username]["associated_ability"] = None
-	users[username]["associated_ability_score"] = None
-	users[username]["chosen_skill"] = None
-	users[username]["ability_modifier"] = None
-	users[username]["proficiency_die_result"] = None
-	users[username]["d20_result"] = None
-	
-	users[username]["confirm_name_state"] = True
+	users[username] = {"name" : message.content.capitalize(), "associated_ability" : None, "associated_ability_score" : None, "chosen_skill" : None, "ability_modifier" : None, "proficiency_die_result" : None, "d20_result" : None, "register_new_user" : None, "register_new_user" : False, "confirm_name_state" : True}
 	return f'You have entered the character name: {users[username]["name"]}. Please confirm that this is your character name. Select confirm or cancel.'
 
 
@@ -226,9 +216,11 @@ def check_wages(check_result):
 	elif check_result >= 25:
 		return f"a large, cut gemstone worth 500 VP"
 
+
 try:
   print("De bot is online.")
   client.run(TOKEN)
 except Exception as e:
   print(e)
   os.system("kill 1")
+

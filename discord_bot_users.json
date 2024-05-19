@@ -7,9 +7,9 @@
             "dexterity" : 15,
             "wisdom" : 10
         },
-        "skill proficiencies" : {
-            "acrobatics" : true,
-            "animal handling" : false
+        "skill proficiencies": {
+            "acrobatics": true,
+            "animal handling": false
         },
         "initialize_state" : true,
         "activity_asking_state" : false,
@@ -25,8 +25,8 @@
         "proficiency_die_result" : null,
         "d20_result" : null
     },
-    "mandraki15_35711" : {
-        "name" : "Ush'ga",
-        "class" : "Mystic"
-    } 
+    "mandraki15_35711": {
+        "name": "Ush'ga",
+        "class": "Mystic"
+    }
 }
