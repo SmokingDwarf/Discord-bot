@@ -125,17 +125,21 @@ def register_new_user(message):
 	'''Set the user's message as their new name, and confirm the name with the user,
 	then proceed to ask the user's level.'''
 	users[username]["name"] = message.content.capitalize()
-	users[username]["register_new_user"] = False
+	users[username]["new_user_state"] = False
 	users[username]["level_query_state"] = True
 	return f'You have entered the character name: {users[username]["name"]}. Continue by entering your level, or cancel to change your name.'
 
 def level_query(message):
 	'''Ask level, or let the user cancel.'''
-	if int(message.content) >= 0 and int(message.content) <= 20:
-		users[username]["level"] = int(message.content)
-		users[username]["level_query_state"] = False
-		users[username]["initialize_state"] = True
-		return f'Great. Your level is {users[username]["level"]}'
+	if message.content.isdecimal():
+		number = int(message.content)
+		if number >= 0 and number <= 20:
+			users[username]["level"] = number
+			users[username]["level_query_state"] = False
+			users[username]["initialize_state"] = True
+			return f'Great. Your level is {users[username]["level"]}'
+		else:
+			return f"Please enter a number between 1 and 20, or enter 'cancel'."
 
 	elif "cancel" in message.content.lower():
 		users[username]["name"] = None
@@ -150,7 +154,7 @@ def name_query(message):
 	users[username]["name"] = message.content.capitalize()
 	users[username]["level_query_state"] = True
 	users[username]["name_query_state"] = False
-	return f'You have entered the character name: {users[username]["name"]}. Please confirm that this is your character name. Select confirm or cancel.'
+	return f'You have entered the character name: {users[username]["name"]}. Continue by entering your level, or cancel to change your name.'
 
 def activity_query(message):
 	if message.content.lower() in activity_list:
