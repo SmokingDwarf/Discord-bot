@@ -144,21 +144,26 @@ def activity_query(message):
 
 def skill_query(message):
 	if message.content.lower() in skill_dict:
-		users[username]["skill_asking_state"] = False
-		users[username]["chosen_skill"] = message.content.lower()
+		users[username] = {"skill_asking_state" : False, "chosen_skill" : message.content.lower()}
 			
 		for key, value in skill_dict.items():
 			if key == users[username]["chosen_skill"]:
 				users[username]["associated_ability"] = value
-				users[username]["associated_ability_score"] = users[username]["ability scores"][users[username]["associated_ability"]]
+				ability = users[username]["associated_ability"]
+				skill = users[username]["chosen_skill"]
+				ability_scores = users[username]["ability_scores"].items()
+				for key, value in ability_scores:
+					if key == skill:
+						users[username]["associated_ability_score"] = value
+				score = users[username]["associated_ability_score"]
 				
-				if users[username]["skill proficiencies"][users[username]["chosen_skill"]] == True:
+				if users[username]["skill proficiencies"][y] == True:
 					users[username]["roll_state"] = True
-					return f"{users[username]['chosen_skill'].capitalize()} is a {users[username]['associated_ability']} skill. Your {users[username]['associated_ability']} score is {users[username]['associated_ability_score']}. You are proficient with {users[username]['chosen_skill']}. Ready? Please type roll or cancel."
+					return f"{skill.capitalize()} is a {ability.capitalize()} skill. Your {ability.capitalize()} score is {score}. You are proficient with {skill}. Please type 'roll' to proceed, or 'cancel' to return to skill selection."
 				
 				elif users[username]["skill proficiencies"][users[username]["chosen_skill"]] == False:
 					users[username]["roll_state"] = True
-					return f'{users[username]["chosen_skill"].capitalize()} is a {users[username]["associated_ability"]} skill. Your {users[username]["associated_ability"]} score is {users[username]["associated_ability_score"]}. You are not proficient with {users[username]["chosen_skill"]}. Ready? Please type roll or cancel.'
+					return f"{skill.capitalize()} is a {ability.capitalize()} skill. Your {ability.capitalize()} score is {score}. You are not proficient with {skill}. Please type 'roll' to proceed, or 'cancel' to return to skill selection."
 		
 		else:
 			return f"Please select from: {', '.join(list(skill_dict.keys()))}."

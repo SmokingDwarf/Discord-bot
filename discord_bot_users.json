@@ -1,9 +1,9 @@
 {
-    "test_mich5613" : {
+    "mich5613" : {
         "name" : "Heracles", 
         "class" : "Champion",
         "level" : 1,
-        "ability scores" : {
+        "ability_scores" : {
             "dexterity" : 15,
             "wisdom" : 10
         },
@@ -13,9 +13,11 @@
         },
         "initialize_state" : true,
         "activity_asking_state" : false,
+        "confirm_name_state" : false,
         "new_user_state" : false,
         "skill_asking_state" : false,
         "roll_state" : false,
+        "name_query_state" : false,
         "associated_ability" : null,
         "associated_ability_score" : null,
         "chosen_skill" : null,
