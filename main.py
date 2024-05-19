@@ -46,10 +46,16 @@ client = discord.Client(intents=intents)
 
 #Lists & dicts
 activity_list = ["work"]
-skill_dict = {"acrobatics": "dexterity", "animal handling": "wisdom"}
+skill_dict = {
+	"acrobatics": "dexterity", 
+	"animal handling": "wisdom"
+}
 
 @reply_to_all(client)
 def send_message(message):
+	'''Function that responds to messages, 
+	and checks if user exists or not.
+	if not, then create and add new user to json'''
 	global users
 	global username
 	username = str(message.author)
@@ -63,8 +69,19 @@ def send_message(message):
 				return run_program
 		
 		if username not in users:
+			print("de fout ligt op lijn 66")
 			users[username] = {}
-			users[username] = {"new_user_state" : True, "initialize_state" : False, "confirm_name_state" : False, "activity_asking_state" : False, "skill_asking_state" : False, "roll_state" : False, "name_query_state" : False}
+			users[username] = {
+				"new_user_state" : True, 
+				"initialize_state" : False, 
+				"confirm_name_state" : False, 
+				"activity_asking_state" : False, 
+				"skill_asking_state" : False, 
+				"roll_state" : False, 
+				"name_query_state" : False,
+				"ability_scores" : {},
+				"skill_proficiencies" : {}
+			}
 			return f"Welcome, new adventurer! What is your character's name?"
 
 # def update_info():
@@ -72,6 +89,8 @@ def send_message(message):
 	# 	file.write(json.dumps(users, indent=4))
 
 def state_func(message):
+	'''This function checks which states are on, 
+	and then executes the associated function.'''
 	if users[username]["initialize_state"] == True:
 		return initialize()
 	
@@ -94,16 +113,18 @@ def state_func(message):
 		return roll_query(message)
 
 def initialize():	
+	'''Welcome returning user and ask user to select an activity from activity_list'''
 	users[username]["initialize_state"] = False
 	users[username]["activity_asking_state"] = True
 	return f"Hello {users[username]['name']}! Select a downtime activity from: {', '.join(activity_list)}."
 
 def register_new_user(message):
+	'''Set the user's message as their new name, and confirm the name with the user.'''
 	users[username] = {"name" : message.content.capitalize(), "associated_ability" : None, "associated_ability_score" : None, "chosen_skill" : None, "ability_modifier" : None, "proficiency_die_result" : None, "d20_result" : None, "register_new_user" : None, "register_new_user" : False, "confirm_name_state" : True}
 	return f'You have entered the character name: {users[username]["name"]}. Please confirm that this is your character name. Select confirm or cancel.'
 
-
 def confirm_name(message):
+	'''Geef de naam terug en check met de user of de naam correct is. Ga daarna verder.'''
 	if "confirm" in message.content.lower():
 		users[username]["confirm_name_state"] = False
 		users[username]["initialize_state"] = True
@@ -134,73 +155,79 @@ def activity_query(message):
 
 def skill_query(message):
 	if message.content.lower() in skill_dict:
-		users[username] = {"skill_asking_state" : False, "chosen_skill" : message.content.lower()}
-			
-		for key, value in skill_dict.items():
-			if key == users[username]["chosen_skill"]:
-				users[username]["associated_ability"] = value
-				ability = users[username]["associated_ability"]
-				skill = users[username]["chosen_skill"]
-				ability_scores = users[username]["ability_scores"].items()
-				for key, value in ability_scores:
-					if key == skill:
-						users[username]["associated_ability_score"] = value
-				score = users[username]["associated_ability_score"]
-				
-				if users[username]["skill proficiencies"][y] == True:
-					users[username]["roll_state"] = True
-					return f"{skill.capitalize()} is a {ability.capitalize()} skill. Your {ability.capitalize()} score is {score}. You are proficient with {skill}. Please type 'roll' to proceed, or 'cancel' to return to skill selection."
-				
-				elif users[username]["skill proficiencies"][users[username]["chosen_skill"]] == False:
-					users[username]["roll_state"] = True
-					return f"{skill.capitalize()} is a {ability.capitalize()} skill. Your {ability.capitalize()} score is {score}. You are not proficient with {skill}. Please type 'roll' to proceed, or 'cancel' to return to skill selection."
+		users[username]["skill_asking_state"] = False
+		
+		skill = message.content.lower()
+		users[username]["chosen_skill"] = skill
+		ability = skill_dict[skill]
+		score = get_ability_score(skill)
+
+		is_proficient = users[username]["skill proficiencies"][skill]
+
+		if is_proficient:
+			users[username]["roll_state"] = True
+			return f"{skill.capitalize()} is a {ability.capitalize()} skill. Your {ability.capitalize()} score is {score}. You are proficient with {skill}. Please type 'roll' to proceed, or 'cancel' to return to skill selection."
 		
 		else:
-			return f"Please select from: {', '.join(list(skill_dict.keys()))}."
+			users[username]["roll_state"] = True
+			return f"{skill.capitalize()} is a {ability.capitalize()} skill. Your {ability.capitalize()} score is {score}. You are not proficient with {skill}. Please type 'roll' to proceed, or 'cancel' to return to skill selection."
+	
+	else:
+		return f"Please select from: {', '.join(list(skill_dict.keys()))}."
+
+def get_ability_score(skill):
+	ability = skill_dict[skill]
+	score = users[username]["ability_scores"][ability]
+	return score
 
 def roll_query(message):	
 	if "roll" in message.content.lower() and "cancel" not in message.content.lower():
 		users[username]["roll_state"] = False
+		skill = users[username]["chosen_skill"]
+		score = get_ability_score(skill)
 		
-		if users[username]["skill proficiencies"][users[username]["chosen_skill"]] == True:
-			check_result = proficient_skill_check()
-			wages = check_wages(check_result)
-			return f'The result of your roll is d20 ({users[username]["d20_result"]}) + your {users[username]["associated_ability"]} modifier ({users[username]["ability_modifier"]}) + your proficiency die ({users[username]["proficiency_die_result"]}) = {check_result}! Your reward is {wages}.'
+		if users[username]["skill proficiencies"][skill] == True:
+			check_result = proficient_skill_check(score)	
+			return f'You rolled a {check_result}! Your reward is {check_wages(check_result)}.'
 		
-		elif users[username]["skill proficiencies"][users[username]["chosen_skill"]] == False:
-			check_result = not_proficient_skill_check()
-			check_wages(check_result)
-			return f'The result of your roll is d20 ({users[username]["d20_result"]}) + your {users[username]["associated_ability"]} modifier ({users[username]["ability_modifier"]}) = {check_result}! Your reward is {wages}.'
+		elif users[username]["skill proficiencies"][skill] == False:
+			check_result = not_proficient_skill_check(score)
+			return f'You rolled a {check_result}! Your reward is {check_wages(check_result)}.'
 		
 	elif "cancel" in message.content.lower() and "roll" not in message.content.lower():
+		users[username]["chosen_skill"] = None
 		users[username]["roll_state"] = False
-		users[username]["activity_asking_state"] = True
-		return f"Select a downtime activity from: {', '.join(activity_list)}."
+		users[username]["skill_asking_state"] = True
+		return f"Select a skill from {', '.join(list(skill_dict.keys()))}."
 	
 	else:
 		return f"Please select roll or cancel."
 
-def get_ability_modifier(ability_score):	
-	return math.floor((ability_score - 10) / 2)
+def get_ability_modifier(score):
+	'''Return an ability modifier based on a formula that uses an ability score.'''
+	return math.floor((score - 10) / 2)
 
 def get_proficiency_die():
+	'''Determine the proficiency die based on player level, 
+	then return a number between 1 and the maximum of the appropriate die.'''
 	level = users[username]["level"]
 	proficiency_die = (math.ceil(1 + level / 4) * 2)
 	return random.randint(1, proficiency_die)
 
 def get_d20_die():
+	'''Return a random number between 1 and 20'''
 	return random.randint(1, 20)
 
-def proficient_skill_check():
-	users[username]["d20_result"] = get_d20_die()
-	users[username]["ability_modifier"] = get_ability_modifier(users[username]["associated_ability_score"])
-	users[username]["proficiency_die_result"] = get_proficiency_die()
-	return users[username]["d20_result"] + users[username]["ability_modifier"] + users[username]["proficiency_die_result"]
+def proficient_skill_check(score):
+	d20_result = get_d20_die()
+	ability_modifier = get_ability_modifier(score)
+	proficiency_die_result = get_proficiency_die()
+	return d20_result + ability_modifier + proficiency_die_result
 
-def not_proficient_skill_check():
-	users[username]["d20_result"] = get_d20_die()
-	users[username]["ability_modifier"] = get_ability_modifier(users[username]["associated_ability_score"])
-	return users[username]["d20_result"] + users[username]["ability_modifier"]
+def not_proficient_skill_check(score):
+	d20_result = get_d20_die()
+	ability_modifier = get_ability_modifier(score)
+	return d20_result + ability_modifier
 
 def check_wages(check_result):
 	if check_result <= 5:

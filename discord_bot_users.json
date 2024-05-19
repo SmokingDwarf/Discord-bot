@@ -1,5 +1,5 @@
 {
-    "mich5613" : {
+    "testmich5613" : {
         "name" : "Heracles", 
         "class" : "Champion",
         "level" : 1,
@@ -18,10 +18,7 @@
         "skill_asking_state" : false,
         "roll_state" : false,
         "name_query_state" : false,
-        "associated_ability" : null,
-        "associated_ability_score" : null,
         "chosen_skill" : null,
-        "ability_modifier" : null,
         "proficiency_die_result" : null,
         "d20_result" : null
     },
